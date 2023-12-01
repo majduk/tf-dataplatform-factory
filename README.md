@@ -1,9 +1,83 @@
 # Terraform GCP Data Platform Factory
 
+## TODO
+- [ ] Bigtable Clustering
+- [ ] Encryption
+- [ ] Deletion protection
+
 ## Introduction
 This module implements a minimal opinionated Data Platform Architecture based on Dataflow resources.
 
 Base Blueprint: [GCS To BigQuery](https://github.com/GoogleCloudPlatform/cloud-foundation-fabric/blob/master/blueprints/data-solutions/gcs-to-bq-with-least-privileges/README.md)
+
+The main components that this is setting up are:
+
+- Cloud Storage (GCS) bucket for the Dataflow pipeline build temporary storage
+- Cloud Dataflow pipeline: to build fully managed batch and streaming pipelines to transform data ready for processing in the Data Warehouse using Apache Beam.
+- BigQuery dataset and tables: to store the transformed data in and query it using SQL, use it to make reports or begin training machine learning models.
+- Bigtable table: to store the transformed data in
+
+## Setup
+
+This solution assumes you already have a project created and set up where you wish to host these resources. If not, and you would like for the project to create a new project as well, please refer to the [github repository](https://github.com/GoogleCloudPlatform/cloud-foundation-fabric/tree/master/blueprints/data-solutions/gcs-to-bq-with-least-privileges) for instructions.
+
+### Prerequisites
+
+* Have an [organization](https://cloud.google.com/resource-manager/docs/creating-managing-organization) set up in Google cloud.
+* Have a [billing account](https://cloud.google.com/billing/docs/how-to/manage-billing-account) set up.
+* Have an existing [project](https://cloud.google.com/resource-manager/docs/creating-managing-projects) with [billing enabled](https://cloud.google.com/billing/docs/how-to/modify-project), we’ll call this the __service project__.
+
+### Roles & Permissions
+
+In order to spin up this architecture, you will need to be a user with the [IAM](https://cloud.google.com/iam) role on the existing project:
+ - bigtable.appProfiles.get
+ - bigtable.appProfiles.list
+ - bigtable.clusters.get
+ - bigtable.clusters.list
+ - bigtable.instances.get
+ - bigtable.instances.list
+ - bigtable.locations.list
+ - resourcemanager.projects.get
+ - bigtable.clusters.create
+ - bigtable.instances.create
+ - bigtable.clusters.update
+ - bigtable.instances.update
+ - bigtable.appProfiles.create
+ - bigtable.appProfiles.delete
+ - bigtable.appProfiles.update
+ - bigtable.clusters.delete
+ - bigtable.instances.delete
+ - roles/dataflow.admin
+ - bigquery.bireservations.*
+ - bigquery.capacityCommitments.*
+ - bigquery.config.*
+ - bigquery.connections.*
+ - bigquery.dataPolicies.create
+ - bigquery.dataPolicies.delete
+ - bigquery.dataPolicies.get
+ - bigquery.dataPolicies.getIamPolicy
+ - bigquery.dataPolicies.list
+ - bigquery.dataPolicies.setIamPolicy
+ - bigquery.dataPolicies.update
+ - bigquery.datasets.*
+ - bigquery.models.*
+ - bigquery.readsessions.*
+ - bigquery.reservationAssignments.*
+ - bigquery.reservations.*
+ - bigquery.routines.*
+ - bigquery.rowAccessPolicies.create
+ - bigquery.rowAccessPolicies.delete
+ - bigquery.rowAccessPolicies.getIamPolicy
+ - bigquery.rowAccessPolicies.list
+ - bigquery.rowAccessPolicies.overrideTimeTravelRestrictions
+ - bigquery.rowAccessPolicies.setIamPolicy
+ - bigquery.rowAccessPolicies.update
+ - bigquery.savedqueries.*
+ - bigquery.tables.*
+ - resourcemanager.projects.get
+ - resourcemanager.projects.list
+
+__Note__: To grant a user a role, take a look at the [Granting and Revoking Access](https://cloud.google.com/iam/docs/granting-changing-revoking-access#grant-single-role) documentation.
 
 
 ## Requirements

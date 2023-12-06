@@ -13,11 +13,6 @@
 # limitations under the License.
 
 # tfdoc:file:description Terraform Variables.
-variable "org_id" {
-  description = "GCP Organization ID"
-  type        = string
-}
-
 variable "project_id" {
   description = "Project ID where the data Platform is hosted"
   type        = string

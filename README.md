@@ -79,7 +79,6 @@ In order to spin up this architecture, you will need to be a user with the [IAM]
 
 __Note__: To grant a user a role, take a look at the [Granting and Revoking Access](https://cloud.google.com/iam/docs/granting-changing-revoking-access#grant-single-role) documentation.
 
-
 ## Requirements
 
 No requirements.
@@ -108,7 +107,6 @@ No requirements.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_org_id"></a> [org\_id](#input\_org\_id) | GCP Organization ID | `string` | n/a | yes |
 | <a name="input_prefix"></a> [prefix](#input\_prefix) | Prefix used for resource names. | `string` | n/a | yes |
 | <a name="input_project_id"></a> [project\_id](#input\_project\_id) | Project ID where the data Platform is hosted | `string` | n/a | yes |
 | <a name="input_region"></a> [region](#input\_region) | Region used for regional resources. | `string` | `"europe-west1"` | no |

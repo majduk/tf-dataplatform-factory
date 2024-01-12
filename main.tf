@@ -12,6 +12,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+locals {
+  bt_primary = {
+    primary = {
+      zone = "${var.region}-a"
+      encryption_key = var.service_config.bigtable.encryption_key
+      autoscaling = {
+        min_nodes  = 3
+        max_nodes  = 7
+        cpu_target = 70
+      }
+    }
+  }
+  bt_secondary = {
+    secondary = {
+      zone = "${var.region}-b"
+      encryption_key = var.service_config.bigtable.encryption_key
+      autoscaling = {
+        min_nodes  = 3
+        max_nodes  = 7
+        cpu_target = 70
+      }
+    }
+  }
+}
+
 module "gcs-df-tmp" {
   source         = "../../../cloud-foundation-fabric/modules/gcs"
   count  	 = try(var.service_config.dataflow == null) ? 0 : 1
@@ -19,8 +44,8 @@ module "gcs-df-tmp" {
   name	         = replace("${var.prefix}_bl_df_tmp_0","_","-")
   location       = var.region
   storage_class  = "REGIONAL"
-  #encryption_key = var.cmek_encryption ? module.kms[0].keys.key-gcs.id : null
-  #force_destroy  = !var.deletion_protection
+  encryption_key = var.gcs_kms_key
+  force_destroy  = !var.deletion_protection
 }
 
 resource "google_dataflow_job" "big_lake_job" {
@@ -37,6 +62,7 @@ resource "google_dataflow_job" "big_lake_job" {
   ip_configuration  = "WORKER_IP_PRIVATE"
   machine_type      = try(var.service_config.dataflow.machine_type, null)
   parameters 	    = try(var.service_config.dataflow.parameters, null)
+  kms_key_name 	    = try(var.service_config.dataflow.kms_key_name, null)
 }
 
 module "big_lake_dataset" {
@@ -45,7 +71,7 @@ module "big_lake_dataset" {
   project_id     = var.project_id
   id		 = replace("${var.prefix}_bl_bq_0","-","_")
   location       = var.region
-  #encryption_key = try(local.service_encryption_keys.bq, null)
+  encryption_key = try(var.service_config.bigquery.encryption_key, null)
   tables 	 = var.service_config.bigquery.tables
 }
 
@@ -54,17 +80,7 @@ module "bigtable-instance" {
   count    	 = try(var.service_config.bigtable == null) ? 0 : 1
   project_id     = var.project_id
   name	         = replace("${var.prefix}_bl_bt_0","_","-")
-  #deletion_protection  = !var.deletion_protection
-  #TODO: if replication
-  clusters 	 = {
-    primary = {
-      zone = "${var.region}-a"
-      autoscaling = {
-        min_nodes  = 3
-        max_nodes  = 7
-        cpu_target = 70
-      }
-    }
-  }
+  deletion_protection  = var.deletion_protection
+  clusters       = var.service_config.bigtable.replicated? local.bt_primary : merge(local.bt_primary, local.bt_secondary)
   tables 	 = try(var.service_config.bigtable.tables, null)
 }

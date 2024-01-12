@@ -1,10 +1,5 @@
 # Terraform GCP Data Platform Factory
 
-## TODO
-- [ ] Bigtable Clustering
-- [ ] Encryption
-- [ ] Deletion protection
-
 ## Introduction
 This module implements a minimal opinionated Data Platform Architecture based on Dataflow resources.
 

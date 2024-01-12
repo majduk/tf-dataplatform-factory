@@ -32,6 +32,20 @@ variable "region" {
   type        = string
   default     = "europe-west1"
 }
+
+variable "gcs_kms_key" {
+  description = "The self link for the Cloud KMS key for the temporary GCS bucket."
+  type        = string
+  default     = null
+}
+
+variable "deletion_protection" {
+  description = "Prevent Terraform from destroying data storage resources (storage buckets, bigtable instance) in this blueprint. When this field is set in Terraform state, a terraform destroy or terraform appl  that would delete data storage resources will fail."
+  type        = bool
+  default     = false
+  nullable    = false
+}
+
 variable "service_config" {
   description = "Data Platform service configuration."
   type = object({
@@ -42,6 +56,7 @@ variable "service_config" {
       subnetwork	= string
       machine_type	= string
       parameters	= optional(map(string))
+      kms_key_name	= optional(string, null)
     }), null)
     bigquery = optional(object({
       tables = map(object({
@@ -127,6 +142,7 @@ variable "service_config" {
     }))
     bigtable = optional(object({
       replicated = optional(bool, false)
+      encryption_key = optional(string, null)
       tables = map(object({}))
     }), null)
   })

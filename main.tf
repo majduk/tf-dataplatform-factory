@@ -75,6 +75,27 @@ module "big_lake_dataset" {
   tables 	 = var.service_config.bigquery.tables
 }
 
+resource "google_bigquery_job" "big_lake_default_kms_key_name" {
+  count      = try(var.service_config.bigquery.default_kms_key_name == null)? 0 : 1
+  job_id     = "big_lake_default_kms_key_name"
+  project    = var.project_id
+  query {
+    default_dataset { 
+      dataset_id = module.big_lake_dataset[0].id
+      project_id = var.project_id
+    }
+    query = <<-EOT
+    "ALTER PROJECT ${var.project_id} 
+     SET OPTIONS ( 
+       `${var.region}.default_kms_key_name` = ${var.service_config.bigquery.default_kms_key_name == null? 
+          "NULL" : var.service_config.bigquery.default_kms_key_name} 
+     );"
+    EOT
+    create_disposition = ""
+    write_disposition = ""
+  }
+}
+
 module "bigtable-instance" {
   source         = "../../../cloud-foundation-fabric/modules/bigtable-instance"
   count    	 = try(var.service_config.bigtable == null) ? 0 : 1

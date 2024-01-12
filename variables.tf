@@ -59,6 +59,7 @@ variable "service_config" {
       kms_key_name	= optional(string, null)
     }), null)
     bigquery = optional(object({
+      default_kms_key_name = optional(string, null)
       tables = map(object({
         deletion_protection      = optional(bool)
         description              = optional(string, "Terraform managed.")
